@@ -1,0 +1,50 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "name": "ms_lms_pl_200_silver_to_300_gold",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "200_silver_to_300_gold",
+                        "type": "TridentNotebook",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "0a0657ec-9cb4-4802-baea-89082872fd66",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "today_date": {
+                                    "value": {
+                                        "value": "@pipeline().parameters.process_date",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "process_date": {
+                        "type": "string"
+                    }
+                },
+                "lastModifiedByObjectId": "158f9db9-f95c-4767-af98-8d4e9b252f6b",
+                "lastPublishTime": "2025-10-02T18:12:30Z"
+            },
+            "dependsOn": []
+        }
+    ]
+}

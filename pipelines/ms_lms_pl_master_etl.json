@@ -1,0 +1,404 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "FabricDataPipelines maciej.swiatek": {
+            "type": "string"
+        },
+        "ms_lms_con_adls_raw": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "ms_lms_pl_master_etl",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "raw_to_landing",
+                        "type": "InvokePipeline",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "waitOnCompletion": true,
+                            "operationType": "InvokeFabricPipeline",
+                            "pipelineId": "6567886e-d431-4f14-8875-61422c09e807",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "process_date": {
+                                    "value": "@{formatDateTime(utcNow(),'yyyy-MM-dd')}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        "externalReferences": {
+                            "connection": "[parameters('FabricDataPipelines maciej.swiatek')]"
+                        }
+                    },
+                    {
+                        "name": "landing_to_100_bronze",
+                        "type": "InvokePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "raw_to_landing",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "waitOnCompletion": true,
+                            "operationType": "InvokeFabricPipeline",
+                            "pipelineId": "9dd44565-0687-4d53-842b-547b587aa821",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "process_date": {
+                                    "value": "@{formatDateTime(utcNow(),'yyyy-MM-dd')}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        "externalReferences": {
+                            "connection": "[parameters('FabricDataPipelines maciej.swiatek')]"
+                        }
+                    },
+                    {
+                        "name": "100_bronze_to_200_silver",
+                        "type": "InvokePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "landing_to_100_bronze",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "waitOnCompletion": true,
+                            "operationType": "InvokeFabricPipeline",
+                            "pipelineId": "333e310e-50be-48eb-83b1-44169971e221",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "process_date": {
+                                    "value": "@{formatDateTime(utcNow(),'yyyy-MM-dd')}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        "externalReferences": {
+                            "connection": "[parameters('FabricDataPipelines maciej.swiatek')]"
+                        }
+                    },
+                    {
+                        "name": "200_silver_to_300_gold",
+                        "type": "InvokePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "100_bronze_to_200_silver",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "waitOnCompletion": true,
+                            "operationType": "InvokeFabricPipeline",
+                            "pipelineId": "40a04183-997d-4a0f-b6f0-9418209549ca",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "process_date": {
+                                    "value": "@{formatDateTime(utcNow(),'yyyy-MM-dd')}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        "externalReferences": {
+                            "connection": "[parameters('FabricDataPipelines maciej.swiatek')]"
+                        }
+                    }
+                ],
+                "lastModifiedByObjectId": "158f9db9-f95c-4767-af98-8d4e9b252f6b",
+                "lastPublishTime": "2025-10-02T18:14:10Z"
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "ms_lms_pl_raw_to_landing",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Get files from raw folder",
+                        "type": "GetMetadata",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "fieldList": [
+                                "childItems"
+                            ],
+                            "datasetSettings": {
+                                "annotations": [],
+                                "type": "DelimitedText",
+                                "typeProperties": {
+                                    "location": {
+                                        "type": "AzureBlobFSLocation",
+                                        "folderPath": "raw",
+                                        "fileSystem": "raw"
+                                    },
+                                    "columnDelimiter": ",",
+                                    "escapeChar": "\\",
+                                    "firstRowAsHeader": true,
+                                    "quoteChar": "\""
+                                },
+                                "schema": [],
+                                "externalReferences": {
+                                    "connection": "[parameters('ms_lms_con_adls_raw')]"
+                                }
+                            },
+                            "storeSettings": {
+                                "type": "AzureBlobFSReadSettings",
+                                "recursive": true,
+                                "modifiedDatetimeStart": {
+                                    "value": "@startOfDay(utcNow())",
+                                    "type": "Expression"
+                                },
+                                "modifiedDatetimeEnd": {
+                                    "value": "@{formatDateTime(utcNow(),'yyyy-MM-dd')}T23:59:00Z",
+                                    "type": "Expression"
+                                },
+                                "enablePartitionDiscovery": false
+                            },
+                            "formatSettings": {
+                                "type": "DelimitedTextReadSettings"
+                            }
+                        }
+                    },
+                    {
+                        "name": "raw_to_landing_items",
+                        "type": "ForEach",
+                        "dependsOn": [
+                            {
+                                "activity": "Get files from raw folder",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Get files from raw folder').output.childItems",
+                                "type": "Expression"
+                            },
+                            "isSequential": true,
+                            "activities": [
+                                {
+                                    "name": "ms_lms_nb_raw_to_landing",
+                                    "type": "TridentNotebook",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "0.12:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "typeProperties": {
+                                        "notebookId": "df95a298-c4a2-4c82-bc65-c61bfc3bf236",
+                                        "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                                        "parameters": {
+                                            "today_file": {
+                                                "value": {
+                                                    "value": "@item().name",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "string"
+                                            },
+                                            "processing_date": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.process_date",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "parameters": {
+                    "process_date": {
+                        "type": "string"
+                    }
+                },
+                "lastModifiedByObjectId": "158f9db9-f95c-4767-af98-8d4e9b252f6b",
+                "lastPublishTime": "2025-10-02T18:10:03Z"
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "ms_lms_pl_landing_to_100_bronze",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "landing_to_100_bronze",
+                        "type": "TridentNotebook",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "1c21915d-b7bc-4e14-a5ae-4361fc165cd4",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "today_date": {
+                                    "value": {
+                                        "value": "@pipeline().parameters.process_date",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "process_date": {
+                        "type": "string"
+                    }
+                },
+                "lastModifiedByObjectId": "158f9db9-f95c-4767-af98-8d4e9b252f6b",
+                "lastPublishTime": "2025-10-02T18:10:49Z"
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "ms_lms_pl_100_bronze_to_200_silver",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "100_bronze_to_200_silver",
+                        "type": "TridentNotebook",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "4090c8a6-fe05-4fbb-87b9-aad3013256ef",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "today_date": {
+                                    "value": {
+                                        "value": "@pipeline().parameters.process_date",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "process_date": {
+                        "type": "string"
+                    }
+                },
+                "lastModifiedByObjectId": "158f9db9-f95c-4767-af98-8d4e9b252f6b",
+                "lastPublishTime": "2025-10-02T18:13:00Z"
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "ms_lms_pl_200_silver_to_300_gold",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "200_silver_to_300_gold",
+                        "type": "TridentNotebook",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "0a0657ec-9cb4-4802-baea-89082872fd66",
+                            "workspaceId": "30b7edc1-64f9-4583-8c8f-2498c1953029",
+                            "parameters": {
+                                "today_date": {
+                                    "value": {
+                                        "value": "@pipeline().parameters.process_date",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "parameters": {
+                    "process_date": {
+                        "type": "string"
+                    }
+                },
+                "lastModifiedByObjectId": "158f9db9-f95c-4767-af98-8d4e9b252f6b",
+                "lastPublishTime": "2025-10-02T18:12:30Z"
+            },
+            "dependsOn": []
+        }
+    ]
+}
