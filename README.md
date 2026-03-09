@@ -1,5 +1,7 @@
 # Learning Management System
 
+  [![Fabric](https://img.shields.io/badge/Fabric-brightgreen)](https://learn.microsoft.com/en-us/fabric/)  [![Azure](https://img.shields.io/badge/Azure-lightblue)](https://azure.microsoft.com/)  [![PySpark](https://img.shields.io/badge/PySpark-orange)](https://spark.apache.org/docs/latest/api/python/)
+
 This repository contains resources for a Learning Management System (LMS) data pipeline. It includes notebooks for exploring and configuring the system, as well as pipeline definitions in JSON format.
 
 ## Directory Structure
