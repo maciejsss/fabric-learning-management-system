@@ -1,5 +1,5 @@
-# Ignore images folder
-img/
+# Ignore the .env file containing environment variables
+.env
 
 # Python related (if any)
 __pycache__/
