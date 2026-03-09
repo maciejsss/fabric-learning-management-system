@@ -1,0 +1,9 @@
+# Ignore images folder
+img/
+
+# Python related (if any)
+__pycache__/
+*.pyc
+
+# Jupyter notebooks checkpoint files
+.ipynb_checkpoints/
